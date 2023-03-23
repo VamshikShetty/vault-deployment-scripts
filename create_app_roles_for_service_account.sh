@@ -31,7 +31,7 @@ createServiceAppPolicyAndRole() {
 
    # Create a policy to read secrets path of give service app.
    echo "Creating role ID and service account for $LOCAL_SERVICE_NAME app, with policy over path : $LOCAL_SECRETS_PATH"
-   POLICY_PAYLOAD=$(sed "s/{service-account-secrets-path}/$LOCAL_SECRETS_PATH\/data\/apps\/$LOCAL_POLICY_VALID_OVER_ROLE/" templates/secrets-path-read-policy-payload.template)
+   POLICY_PAYLOAD=$(sed "s/{service-secrets-path}/$LOCAL_SECRETS_PATH\/data\/apps\/$LOCAL_POLICY_VALID_OVER_ROLE/" templates/secrets-path-read-policy-payload.template)
 
    APP_ROLE_POLICY=$LOCAL_SERVICE_NAME-secrets-read-policy
 

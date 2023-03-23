@@ -57,7 +57,7 @@ Capture lessons learnt &amp; automate Vault deployment in Minikube with producti
       export KUBERNETES_SERVICE_PORT=443
 
       // Secrets path for kv-2 engine for service account storing secrets.
-      export SERVICE_ACCOUNT_SECRETS_PATH=service-accounts-secrets
+      export SERVICE_ACCOUNT_SECRETS_PATH=service-secrets
       ```
    2. ./vault_service_enable_and_k8s_configurations.sh
 7. Port forward vault service (in different terminal): `kubectl -n vault-dev port-forward service/vault 16189:8200`

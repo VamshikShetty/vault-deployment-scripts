@@ -26,7 +26,7 @@ Capture lessons learnt &amp; automate Vault deployment in Minikube with producti
      export VAULT_SERVICE_NAME="vault-internal"
      export K8S_CLUSTER_NAME="cluster.local"
      export K8S_VAULT_CERT_SECRET_NAME="vault-ha-tls"
-     export VAULT_NUM_REPLICAS=2
+     export VAULT_NUM_REPLICAS=3
      ```
    2. ./prepare_tls.sh
    4. ./deploy_vault.sh

@@ -1,0 +1,3 @@
+# Don't commit cluster keys.
+vault-cluster-keys.json
+tmp/

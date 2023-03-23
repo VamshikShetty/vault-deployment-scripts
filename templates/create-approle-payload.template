@@ -1,0 +1,8 @@
+{
+  "secret_id_ttl": "10m",
+  "secret_id_num_uses": 2,
+  "token_ttl": "10m",
+  "token_max_ttl": "15m",
+  "token_num_uses": 5,
+  "token_policies": ["default", "{service-name-role-read-policy}"]
+}

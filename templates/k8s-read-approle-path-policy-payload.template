@@ -1,0 +1,3 @@
+{
+  "policy": "path \"{approle-path}/*\" {\n capabilities = [\"read\", \"update\"] \n}"
+}

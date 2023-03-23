@@ -1,0 +1,6 @@
+{
+  "bound_service_account_names": "{k8s-service-account-name}",
+  "bound_service_account_namespaces": "{k8s-namespace}",
+  "policies": ["{service-name-k8s-auth-role-policy}"],
+  "max_ttl": 1800000
+}

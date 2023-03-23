@@ -1,0 +1,12 @@
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+   name: ${CSR_NAME}
+spec:
+   signerName: kubernetes.io/kubelet-serving
+   expirationSeconds: 8640000
+   request: ${CSR_SPEC_REQUEST}
+   usages:
+   - digital signature
+   - key encipherment
+   - server auth

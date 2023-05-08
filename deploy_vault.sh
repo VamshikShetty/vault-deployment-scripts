@@ -9,7 +9,7 @@ if [[ -z "${VAULT_K8S_NAMESPACE}" ]]; then
    exit 1
 fi
 
-if [[ -z "${VAULT_HELM_RELEASE_NAME}" ]]; then
+if [[ -z "${VAULT_RELEASE_NAME}" ]]; then
    echo "Vault helm release name is not set."
    exit 1
 fi
@@ -25,7 +25,7 @@ helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 
 # Deploy vault into k8s env.
-helm install -n $VAULT_K8S_NAMESPACE $VAULT_HELM_RELEASE_NAME hashicorp/vault --values helm-vault-raft-values.yml
+helm install -n $VAULT_K8S_NAMESPACE $VAULT_RELEASE_NAME hashicorp/vault --values helm-vault-raft-values.yml
 
 # Wait until pods are up and running.
 vaultPodIsReady() {
@@ -47,7 +47,7 @@ vaultPodsAreReady() {
    for (( i=0; i < $VAULT_NUM_REPLICAS; i++ ))
    do 
       echo "checking status of $VAULT_NUM_REPLICAS-$i"
-      val=$(vaultPodIsReady $VAULT_HELM_RELEASE_NAME-$i)
+      val=$(vaultPodIsReady $VAULT_RELEASE_NAME-$i)
       ((ret = ret + $val))
    done
    echo "Number of pods yet to achieve running state : $ret"

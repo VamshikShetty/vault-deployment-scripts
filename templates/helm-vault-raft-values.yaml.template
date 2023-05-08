@@ -10,7 +10,7 @@ server:
     - name: config-vault-ha-tls
       secret:
         defaultMode: 420
-        secretName: ${K8S_VAULT_CERT_SECRET_NAME}
+        secretName: ${K8S_VAULT_CERT_NAME}
   volumeMounts:
     - mountPath: /vault/config/vault-ha-tls
       name: config-vault-ha-tls

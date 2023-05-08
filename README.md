@@ -22,10 +22,10 @@ Capture lessons learnt &amp; automate Vault deployment in Minikube with producti
      export VAULT_K8S_NAMESPACE="vault-dev"
      kubectl create namespace $VAULT_K8S_NAMESPACE
 
-     export VAULT_HELM_RELEASE_NAME="vault"
+     export VAULT_RELEASE_NAME="vault"
      export VAULT_SERVICE_NAME="vault-internal"
      export K8S_CLUSTER_NAME="cluster.local"
-     export K8S_VAULT_CERT_SECRET_NAME="vault-ha-tls"
+     export K8S_VAULT_CERT_NAME="vault-ha-tls"
      export VAULT_NUM_REPLICAS=2
      ```
    2. ./prepare_tls.sh
@@ -33,21 +33,21 @@ Capture lessons learnt &amp; automate Vault deployment in Minikube with producti
 4. Initializing Vault 0:
    ```
    // Initialize vault.
-   kubectl -n $VAULT_K8S_NAMESPACE exec $VAULT_HELM_RELEASE_NAME-0 -- vault operator init -key-shares=5 -key-threshold=3 -format=json > vault-cluster-keys.json
+   kubectl -n $VAULT_K8S_NAMESPACE exec $VAULT_RELEASE_NAME-0 -- vault operator init -key-shares=5 -key-threshold=3 -format=json > vault-cluster-keys.json
    ```
 5. Unseal pods and join vault 0th node via raft to form cluster:
    ```
-   ./useal_vault_pods.sh $VAULT_HELM_RELEASE_NAME-0
+   ./useal_vault_pods.sh $VAULT_RELEASE_NAME-0
 
    // Make vault-1 and vault-2 join raft with vault-0.
-   kubectl -n $VAULT_K8S_NAMESPACE exec -ti $VAULT_HELM_RELEASE_NAME-1 -- /bin/sh
+   kubectl -n $VAULT_K8S_NAMESPACE exec -ti $VAULT_RELEASE_NAME-1 -- /bin/sh
    $> vault operator raft join -address=https://vault-1.vault-internal:8200 -leader-ca-cert="$(cat /vault/config/vault-ha-tls/vault.ca)" -leader-client-cert="$(cat /vault/config/vault-ha-tls/vault.crt)" -leader-client-key="$(cat /vault/config/vault-ha-tls/vault.key)" https://vault-0.vault-internal:8200
 
-   kubectl -n $VAULT_K8S_NAMESPACE exec -ti $VAULT_HELM_RELEASE_NAME-2 -- /bin/sh
+   kubectl -n $VAULT_K8S_NAMESPACE exec -ti $VAULT_RELEASE_NAME-2 -- /bin/sh
    $> vault operator raft join -address=https://vault-2.vault-internal:8200 -leader-ca-cert="$(cat /vault/config/vault-ha-tls/vault.ca)" -leader-client-cert="$(cat /vault/config/vault-ha-tls/vault.crt)" -leader-client-key="$(cat /vault/config/vault-ha-tls/vault.key)" https://vault-0.vault-internal:8200
 
-   ./useal_vault_pods.sh $VAULT_HELM_RELEASE_NAME-1 3
-   ./useal_vault_pods.sh $VAULT_HELM_RELEASE_NAME-2 3
+   ./useal_vault_pods.sh $VAULT_RELEASE_NAME-1 3
+   ./useal_vault_pods.sh $VAULT_RELEASE_NAME-2 3
    ```
 6. Enable vault kv secrets engine, AppRole auth & kubernetes auth :s
    1. Setting required param:
@@ -68,3 +68,11 @@ Capture lessons learnt &amp; automate Vault deployment in Minikube with producti
    ```
 8. ./create_service_account_secrets.sh
 9. ./create_app_roles_for_service_account.sh
+10. Copy CA cert config maps :
+   ```
+   export SVCACC_NAMESPACE=svcacc-service
+   kubectl -n ${SVCACC_NAMESPACE} delete configmap ${K8S_VAULT_CERT_NAME}
+   kubectl -n ${VAULT_K8S_NAMESPACE} get configmap ${K8S_VAULT_CERT_NAME} -o yaml \
+      | sed "s/namespace: ${VAULT_K8S_NAMESPACE}/namespace: ${SVCACC_NAMESPACE}/" \
+      | kubectl --namespace=${SVCACC_NAMESPACE} create -f -
+   ```

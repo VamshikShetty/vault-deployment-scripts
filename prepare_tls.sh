@@ -13,22 +13,12 @@ if [[ -z "${VAULT_K8S_NAMESPACE}" ]]; then
    exit 1
 fi
 
-if [[ -z "${VAULT_HELM_RELEASE_NAME}" ]]; then
-   echo "vault helm release name is not set."
-   exit 1
-fi
-
-if [[ -z "${VAULT_SERVICE_NAME}" ]]; then
-   echo "vault service name is not set."
-   exit 1
-fi
-
 if [[ -z "${K8S_CLUSTER_NAME}" ]]; then
    echo "K8s cluster name is not set."
    exit 1
 fi
 
-if [[ -z "${K8S_VAULT_CERT_SECRET_NAME}" ]]; then
+if [[ -z "${K8S_VAULT_CERT_NAME}" ]]; then
    echo "K8s vault cert secret name is not set."
    exit 1
 fi
@@ -64,10 +54,16 @@ kubectl config view \
    | base64 -d > $WORKDIR/vault.ca
 
 # Create the TLS K8s secret
-kubectl -n $VAULT_K8S_NAMESPACE delete secret $K8S_VAULT_CERT_SECRET_NAME
-kubectl create secret generic $K8S_VAULT_CERT_SECRET_NAME \
+kubectl -n $VAULT_K8S_NAMESPACE delete secret $K8S_VAULT_CERT_NAME
+kubectl create secret generic $K8S_VAULT_CERT_NAME \
    -n $VAULT_K8S_NAMESPACE \
    --from-file=vault.key=$WORKDIR/vault.key \
+   --from-file=vault.crt=$WORKDIR/vault.crt \
+   --from-file=vault.ca=$WORKDIR/vault.ca
+
+kubectl -n $VAULT_K8S_NAMESPACE delete configmap $K8S_VAULT_CERT_NAME
+kubectl create configmap $K8S_VAULT_CERT_NAME \
+   -n $VAULT_K8S_NAMESPACE \
    --from-file=vault.crt=$WORKDIR/vault.crt \
    --from-file=vault.ca=$WORKDIR/vault.ca
 
